@@ -135,9 +135,50 @@ body {
         margin: 0.2rem;
         padding: 0.5rem 1rem;
     }
+
+    /* Mejorar tablas en móvil */
+    .table-responsive {
+        border: none;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Cards más compactos en móvil */
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    /* Botones de ancho completo en móvil */
+    .btn-block-mobile {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Reducir padding en hero section */
+    .hero-section {
+        padding: 2rem 0;
+    }
+
+    /* Footer más compacto */
+    .footer {
+        margin-top: 2rem;
+        padding: 1.5rem 0;
+    }
 }
 
-/* Animaciones */
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .cart-floating {
+        width: 350px;
+    }
+}
+
+/* Animaciones suaves */
 .fade-enter {
     opacity: 0;
 }
@@ -145,6 +186,65 @@ body {
 .fade-enter-active {
     opacity: 1;
     transition: opacity 300ms ease-in;
+}
+
+/* Transiciones suaves globales */
+button, .btn, .card, .nav-link {
+    transition: all 0.3s ease;
+}
+
+/* Animación para botones en hover */
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Animaciones de fade para elementos */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease;
+}
+
+/* Animación para states vacíos */
+.empty-state {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Focus states mejorados para accesibilidad */
+button:focus,
+.btn:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Mejora de contraste para accesibilidad */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Loading spinner personalizado */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
 }
 
 /* Badge del carrito */
