@@ -137,6 +137,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const localOrders = document.getElementById('local-orders');
@@ -145,6 +146,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const orderDetailsContent = document.getElementById('order-details-content');
     const completeOrderBtn = document.getElementById('complete-order-btn');
     let currentOrderId = null;
+
+    // Conectar a WebSocket para actualizaciones en tiempo real
+    const socket = io();
+
+    // Escuchar evento de nuevo pedido
+    socket.on('new_order', function(data) {
+        console.log('Nuevo pedido recibido:', data);
+        Toast.info(`Nuevo pedido de Mesa ${data.table_number}`);
+        loadOrders(); // Recargar pedidos
+    });
+
+    // Manejo de conexión
+    socket.on('connect', function() {
+        console.log('Conectado al servidor WebSocket');
+    });
+
+    socket.on('disconnect', function() {
+        console.log('Desconectado del servidor WebSocket');
+    });
 
     function updateTime() {
         const timeDisplay = document.getElementById('current-time');
@@ -159,7 +179,18 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 localOrders.innerHTML = '';
                 localCount.textContent = data.orders.length;
-                
+
+                // Mostrar estado vacío si no hay pedidos
+                if (data.orders.length === 0) {
+                    const emptyState = EmptyState.create({
+                        icon: 'fas fa-utensils',
+                        message: 'No hay pedidos activos',
+                        submessage: 'Los nuevos pedidos aparecerán aquí automáticamente'
+                    });
+                    localOrders.appendChild(emptyState);
+                    return;
+                }
+
                 data.orders.forEach(order => {
                     const orderCard = document.createElement('div');
                     orderCard.className = 'card order-card';
@@ -213,30 +244,59 @@ document.addEventListener('DOMContentLoaded', function() {
         orderDetailsModal.show();
     }
 
-    completeOrderBtn.addEventListener('click', function() {
-        if (currentOrderId) {
-            fetch('/admin/kitchen/complete_order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    order_id: currentOrderId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    orderDetailsModal.hide();
-                    loadOrders();
-                }
-            });
+    completeOrderBtn.addEventListener('click', async function() {
+        if (!currentOrderId) {
+            return;
         }
+
+        const confirmed = await ConfirmModal.show({
+            title: 'Completar Pedido',
+            message: '¿Marcar este pedido como completado?',
+            confirmText: 'Completar',
+            cancelText: 'Cancelar',
+            type: 'info'
+        });
+
+        if (!confirmed) {
+            return;
+        }
+
+        const originalState = LoadingState.start(completeOrderBtn, 'Completando...');
+
+        fetch('/admin/kitchen/complete_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_id: currentOrderId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            LoadingState.stop(completeOrderBtn, originalState);
+
+            if (data.success) {
+                Toast.success('Pedido completado exitosamente');
+                orderDetailsModal.hide();
+                loadOrders();
+            } else {
+                Toast.error('Error al completar el pedido');
+            }
+        })
+        .catch(error => {
+            LoadingState.stop(completeOrderBtn, originalState);
+            console.error('Error:', error);
+            Toast.error('Error al completar el pedido');
+        });
     });
 
-    // Cargar pedidos inicialmente y actualizar cada 30 segundos
+    // Cargar pedidos inicialmente
     loadOrders();
-    setInterval(loadOrders, 30000);
+
+    // Las actualizaciones ahora se manejan en tiempo real vía WebSocket
+    // Fallback: actualizar cada 2 minutos en caso de fallo del WebSocket
+    setInterval(loadOrders, 120000);
 });
 </script>
 {% endblock %}

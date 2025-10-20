@@ -1,6 +1,8 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app.main import bp
 from app.models import MenuItem, TableToken, Order, OrderItem, db
+from app import socketio
+from flask_socketio import emit
 from datetime import datetime
 
 @bp.route('/')
@@ -92,8 +94,17 @@ def create_order():
         
         db.session.commit()
         print(f"Orden creada con ID: {order.id}")  # Debug print
+
+        # Emitir evento de WebSocket para notificar a la cocina
+        socketio.emit('new_order', {
+            'order_id': order.id,
+            'table_number': order.table_number,
+            'is_delivery': order.is_delivery,
+            'total': order.total
+        }, namespace='/')
+
         return jsonify({
-            'success': True, 
+            'success': True,
             'order_id': order.id,
             'message': 'Pedido creado exitosamente'
         })

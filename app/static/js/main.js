@@ -132,33 +132,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }).format(price);
     }
 
-    // Mostrar toast
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast position-fixed bottom-0 end-0 m-3';
-        toast.setAttribute('role', 'alert');
-        toast.innerHTML = `
-            <div class="toast-body bg-success text-white">
-                ${message}
-            </div>
-        `;
-        document.body.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        setTimeout(() => toast.remove(), 3000);
+    // Usar el sistema de toasts modernos
+    function showToast(message, type = 'success') {
+        if (window.Toast) {
+            window.Toast[type](message);
+        }
     }
 
     // Enviar pedido
     window.submitOrder = function() {
         if (cart.length === 0) {
-            showToast('El carrito está vacío');
+            showToast('El carrito está vacío', 'warning');
             return;
+        }
+
+        // Obtener botón y agregar loading state
+        const submitButton = document.querySelector('[onclick="submitOrder()"]');
+        let originalState = null;
+        if (submitButton && window.LoadingState) {
+            originalState = window.LoadingState.start(submitButton, 'Enviando pedido...');
         }
 
         // Obtener el número de mesa de la URL si existe
         const pathParts = window.location.pathname.split('/');
         const token = pathParts[pathParts.length - 1];
-        
+
         // Preparar los datos del pedido
         const orderData = {
             items: cart.map(item => ({
@@ -183,8 +181,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
+            // Restaurar estado del botón
+            if (submitButton && originalState && window.LoadingState) {
+                window.LoadingState.stop(submitButton, originalState);
+            }
+
             if (data.success) {
-                showToast('Pedido enviado correctamente');
+                showToast('Pedido enviado correctamente', 'success');
                 cart = [];
                 localStorage.removeItem('cart');
                 updateCartUI();
@@ -195,12 +198,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     cartModal.hide();
                 }
             } else {
-                showToast(data.error || 'Error al enviar el pedido');
+                showToast(data.error || 'Error al enviar el pedido', 'error');
             }
         })
         .catch(error => {
+            // Restaurar estado del botón
+            if (submitButton && originalState && window.LoadingState) {
+                window.LoadingState.stop(submitButton, originalState);
+            }
+
             console.error('Error:', error);
-            showToast('Error al enviar el pedido');
+            showToast('Error al enviar el pedido', 'error');
         });
     };
 });

@@ -137,14 +137,14 @@ function activateTable(token, activationCode) {
             // Actualizar la lista de mesas activas
             updateActiveTables();
             // Mostrar mensaje de éxito
-            alert('Mesa activada exitosamente');
+            Toast.success('Mesa activada exitosamente');
         } else {
-            alert(data.error || 'Error al activar la mesa');
+            Toast.error(data.error || 'Error al activar la mesa');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al activar la mesa. Por favor, intente nuevamente.');
+        Toast.error('Error al activar la mesa. Por favor, intente nuevamente.');
     });
 }
 
@@ -214,10 +214,14 @@ document.addEventListener('DOMContentLoaded', function() {
     generateBtn.addEventListener('click', function() {
         const tableNumber = tableNumberInput.value;
         if (!tableNumber) {
-            alert('Por favor, ingrese un número de mesa');
+            Toast.warning('Por favor, ingrese un número de mesa');
+            tableNumberInput.focus();
             return;
         }
-        
+
+        // Activar loading state
+        const originalState = LoadingState.start(generateBtn, 'Generando...');
+
         fetch('/admin/generate_table_qr', {
             method: 'POST',
             headers: {
@@ -229,6 +233,13 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
+            LoadingState.stop(generateBtn, originalState);
+
+            if (data.error) {
+                Toast.error(data.error);
+                return;
+            }
+
             qrCode.src = 'data:image/png;base64,' + data.qr_code;
             qrCode.classList.remove('d-none');
             qrEmptyState.classList.add('d-none');
@@ -236,6 +247,13 @@ document.addEventListener('DOMContentLoaded', function() {
             tokenText.textContent = data.token;
             urlText.value = data.url;
             activationCodeSpan.textContent = data.activation_code;
+
+            Toast.success('Código QR generado exitosamente');
+        })
+        .catch(error => {
+            LoadingState.stop(generateBtn, originalState);
+            console.error('Error:', error);
+            Toast.error('Error al generar el código QR');
         });
     });
 
@@ -250,14 +268,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const token = tokenText.textContent; // Obtener el token del span
 
         if (!activationCode) {
-            alert('Por favor, ingrese el código de activación');
+            Toast.warning('Por favor, ingrese el código de activación');
+            activationCodeInput.focus();
             return;
         }
 
         if (!token) {
-            alert('Por favor, genere un código QR primero');
+            Toast.warning('Por favor, genere un código QR primero');
             return;
         }
+
+        // Activar loading state
+        const originalState = LoadingState.start(activateTableBtn, 'Activando...');
 
         fetch('/admin/activate_table', {
             method: 'POST',
@@ -279,12 +301,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            alert('Mesa activada correctamente');
+            LoadingState.stop(activateTableBtn, originalState);
+            Toast.success('Mesa activada correctamente');
             activationCodeInput.value = '';
             updateActiveTables();
         })
         .catch(error => {
-            alert(error.message);
+            LoadingState.stop(activateTableBtn, originalState);
+            Toast.error(error.message);
         });
     });
 
@@ -328,13 +352,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function copyToClipboard(elementId) {
     const element = document.getElementById(elementId);
-    element.select();
-    document.execCommand('copy');
-    alert('URL copiada al portapapeles');
+    const button = event.target.closest('button');
+    Clipboard.copy(element.value, button);
 }
 
-function deactivateTable(tableNumber) {
-    if (!confirm('¿Está seguro de que desea desactivar esta mesa?')) {
+async function deactivateTable(tableNumber) {
+    const confirmed = await ConfirmModal.show({
+        title: 'Desactivar Mesa',
+        message: `¿Está seguro de que desea desactivar la mesa ${tableNumber}?`,
+        confirmText: 'Desactivar',
+        cancelText: 'Cancelar',
+        type: 'danger'
+    });
+
+    if (!confirmed) {
         return;
     }
 
@@ -356,11 +387,11 @@ function deactivateTable(tableNumber) {
         return response.json();
     })
     .then(data => {
-        alert(data.message || 'Mesa desactivada correctamente');
+        Toast.success(data.message || 'Mesa desactivada correctamente');
         updateActiveTables();
     })
     .catch(error => {
-        alert(error.message);
+        Toast.error(error.message);
     });
 }
 </script>
