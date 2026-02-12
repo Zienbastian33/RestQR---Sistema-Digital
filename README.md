@@ -260,26 +260,56 @@ Las contribuciones son bienvenidas. Por favor, abre un issue primero para discut
 
 ### Despliegue Rápido en Vercel
 
-1. **Preparar código:**
-   ```bash
-   deploy.bat  # Windows
-   ./deploy.sh # Mac/Linux
+Tu código ya está en GitHub y listo para desplegar en Vercel:
+
+**Repositorio:** https://github.com/Zienbastian33/RestQR---Sistema-Digital
+
+#### Pasos para Desplegar:
+
+1. **Ir a Vercel:**
+   - Visita https://vercel.com
+   - Inicia sesión con GitHub
+
+2. **Importar Proyecto:**
+   - Click "Add New..." → "Project"
+   - Busca "RestQR---Sistema-Digital"
+   - Click "Import"
+
+3. **Configurar Variables de Entorno:**
+   
+   En la sección "Environment Variables", agrega:
+   
    ```
-
-2. **Crear repositorio en GitHub**
-
-3. **Desplegar en Vercel:**
-   - Ir a https://vercel.com
-   - Importar repositorio de GitHub
-   - Click "Deploy"
-
-4. **Configurar variables de entorno:**
-   ```
-   SECRET_KEY = [generar clave segura]
+   SECRET_KEY = [generar clave segura - ver abajo]
    FLASK_ENV = production
    ```
+   
+   Para generar SECRET_KEY, ejecuta en tu terminal:
+   ```bash
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
 
-Ver [QUICK_START.md](QUICK_START.md) para guía completa.
+4. **Desplegar:**
+   - Click "Deploy"
+   - Espera 2-3 minutos
+   - ¡Tu app estará en línea!
+
+5. **Inicializar Base de Datos:**
+   
+   Después del despliegue, ejecuta localmente:
+   ```bash
+   python fix_database.py
+   ```
+
+#### Actualizaciones Futuras:
+
+Cada vez que hagas cambios y los subas a GitHub, Vercel desplegará automáticamente:
+
+```bash
+git add .
+git commit -m "Tus cambios"
+git push origin main
+```
 
 ### Características del Despliegue
 
@@ -289,12 +319,10 @@ Ver [QUICK_START.md](QUICK_START.md) para guía completa.
 - ✅ Escalado automático
 - ✅ Dominio personalizado disponible
 
-## 📚 Documentación
+### URL del Proyecto
 
-- [QUICK_START.md](QUICK_START.md) - Guía rápida de despliegue (5 minutos)
-- [DEPLOYMENT.md](DEPLOYMENT.md) - Guía completa de despliegue
-- [SYSTEM_ANALYSIS.md](SYSTEM_ANALYSIS.md) - Análisis del sistema
-- [FIXES_APPLIED.md](FIXES_APPLIED.md) - Correcciones aplicadas
+- **GitHub:** https://github.com/Zienbastian33/RestQR---Sistema-Digital
+- **Vercel:** (se generará después del despliegue)
 
 ## 📄 Licencia
 Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE.md para más detalles.
