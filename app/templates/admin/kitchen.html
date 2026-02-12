@@ -194,11 +194,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.orders.forEach(order => {
                     const orderCard = document.createElement('div');
                     orderCard.className = 'card order-card';
+                    const tableDisplay = order.table_number ? `Mesa ${order.table_number}` : 'Mesa N/A';
                     orderCard.innerHTML = `
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="order-table">Mesa ${order.table_number}</div>
+                                    <div class="order-table">${tableDisplay}</div>
                                     <div class="order-time">${new Date(order.created_at).toLocaleString()}</div>
                                 </div>
                                 <div class="text-end">
@@ -217,9 +218,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showOrderDetails(order) {
         currentOrderId = order.id;
+        const tableDisplay = order.table_number ? `Mesa ${order.table_number}` : 'Mesa N/A';
         orderDetailsContent.innerHTML = `
             <div class="mb-3">
-                <h6>Mesa ${order.table_number}</h6>
+                <h6>${tableDisplay}</h6>
                 <small class="text-muted">Pedido realizado: ${new Date(order.created_at).toLocaleString()}</small>
             </div>
             <div class="order-items">

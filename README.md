@@ -42,7 +42,48 @@ RestQR es una aplicación web moderna diseñada para restaurantes que permite la
 
 ## 🔄 Historial de Desarrollo
 
-### Última Sesión (10/12/2024)
+### Última Sesión - Correcciones Críticas (Febrero 2026)
+
+#### Implementación de Mejoras Críticas del Sistema
+Se completaron las siguientes tareas del plan de correcciones críticas:
+
+1. **Gestión de Tokens QR Mejorada**
+   - Implementación de reutilización de tokens existentes para evitar duplicados
+   - Función `get_or_create_table_token` para gestión eficiente de tokens
+   - Validación de unicidad de tokens activos por mesa
+   - Tests de propiedades para garantizar idempotencia
+
+2. **Seguimiento de Número de Mesa en Pedidos**
+   - Función helper `create_order_from_token` para extracción automática del número de mesa
+   - Validación de tokens activos y no expirados antes de crear pedidos
+   - Actualización de vista de cocina para mostrar números de mesa
+   - Manejo de pedidos legacy sin número de mesa
+
+3. **Consolidación del Carrito de Compras**
+   - Implementación de `CartManager` como única fuente de verdad
+   - localStorage como almacenamiento persistente del carrito
+   - Eliminación de código duplicado en templates
+   - Sincronización automática entre estado y UI
+
+4. **Carga Dinámica de Menú desde Base de Datos**
+   - Eliminación de menús hardcodeados en templates
+   - Consulta dinámica de items desde la tabla MenuItem
+   - Agrupación automática por categorías
+   - Renderizado con Jinja2 para flexibilidad total
+
+5. **Página de Confirmación de Pedidos**
+   - Nueva ruta `/order/confirmation/<order_id>`
+   - Template con detalles completos del pedido
+   - Cálculo automático de totales
+   - Redirección automática después de enviar pedido
+
+6. **Tests de Integración Completos**
+   - Test de flujo completo: QR → menú → carrito → pedido → confirmación
+   - Test de actualización de cocina con SocketIO
+   - Test de generación de QR con reutilización de tokens
+   - Validación de compatibilidad hacia atrás
+
+### Sesión Anterior (10/12/2024)
 
 #### Mejoras en la Gestión de Mesas
 1. **Sistema de Activación de Mesas**
@@ -116,15 +157,18 @@ TableToken:
 
 ## 🚀 Instalación y Configuración
 
+### Desarrollo Local
+
 1. Clonar el repositorio:
 ```bash
 git clone [url-del-repositorio]
-cd proyecto_restqr
+cd RestQR---Sistema-Digital
 ```
 
 2. Crear y activar entorno virtual:
 ```bash
 python -m venv venv
+venv\Scripts\activate  # Windows
 source venv/bin/activate  # Linux/Mac
 ```
 
@@ -133,18 +177,33 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-
 4. Inicializar la base de datos:
 ```bash
 flask db upgrade
+python fix_database.py  # Poblar la base de datos con items de menú de ejemplo
 ```
 
 5. Ejecutar la aplicación:
 ```bash
-flask run
-o
 python run.py
 ```
+
+### Despliegue en Producción
+
+Para desplegar en Vercel (recomendado):
+
+```bash
+# Opción 1: Script automático (Windows)
+deploy.bat
+
+# Opción 2: Script automático (Mac/Linux)
+chmod +x deploy.sh
+./deploy.sh
+```
+
+Ver [QUICK_START.md](QUICK_START.md) para guía rápida de 5 minutos.
+
+Ver [DEPLOYMENT.md](DEPLOYMENT.md) para guía completa de despliegue.
 
 ## 🎯 Uso del Sistema
 
@@ -172,8 +231,70 @@ python run.py
 - Sistema de actualización en tiempo real para la cocina
 - Diseño moderno y fácil de usar
 
+## 🔧 Solución de Problemas
+
+### El menú no muestra items
+Si el menú aparece vacío para los clientes, la base de datos necesita ser poblada con items:
+
+```bash
+# Activar el entorno virtual
+venv\Scripts\activate  # Windows
+
+# Poblar la base de datos
+python init_db.py
+```
+
+Esto creará items de ejemplo en las categorías: Handrolls, Sushi, Bebidas y Extras.
+
+### Verificar items en la base de datos
+```bash
+python check_db.py
+```
+
+Este script mostrará cuántos items hay en la base de datos y sus detalles.
+
 ## 🤝 Contribuir
 Las contribuciones son bienvenidas. Por favor, abre un issue primero para discutir los cambios que te gustaría realizar.
+
+## 🌐 Despliegue
+
+### Despliegue Rápido en Vercel
+
+1. **Preparar código:**
+   ```bash
+   deploy.bat  # Windows
+   ./deploy.sh # Mac/Linux
+   ```
+
+2. **Crear repositorio en GitHub**
+
+3. **Desplegar en Vercel:**
+   - Ir a https://vercel.com
+   - Importar repositorio de GitHub
+   - Click "Deploy"
+
+4. **Configurar variables de entorno:**
+   ```
+   SECRET_KEY = [generar clave segura]
+   FLASK_ENV = production
+   ```
+
+Ver [QUICK_START.md](QUICK_START.md) para guía completa.
+
+### Características del Despliegue
+
+- ✅ Despliegue automático desde GitHub
+- ✅ HTTPS incluido
+- ✅ CDN global
+- ✅ Escalado automático
+- ✅ Dominio personalizado disponible
+
+## 📚 Documentación
+
+- [QUICK_START.md](QUICK_START.md) - Guía rápida de despliegue (5 minutos)
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Guía completa de despliegue
+- [SYSTEM_ANALYSIS.md](SYSTEM_ANALYSIS.md) - Análisis del sistema
+- [FIXES_APPLIED.md](FIXES_APPLIED.md) - Correcciones aplicadas
 
 ## 📄 Licencia
 Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE.md para más detalles.

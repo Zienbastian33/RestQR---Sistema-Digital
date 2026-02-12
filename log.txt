@@ -1,0 +1,42 @@
+AttributeError
+AttributeError: 'OrderItem' object has no attribute 'menu_item'. Did you mean: 'menu_item_id'?
+
+Traceback (most recent call last)
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask\app.py", line 2088, in __call__
+return self.wsgi_app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask_socketio\__init__.py", line 43, in __call__
+return super(_SocketIOMiddleware, self).__call__(environ,
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\engineio\middleware.py", line 74, in __call__
+return self.wsgi_app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask\app.py", line 2073, in wsgi_app
+response = self.handle_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask\app.py", line 2070, in wsgi_app
+response = self.full_dispatch_request()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask\app.py", line 1515, in full_dispatch_request
+rv = self.handle_user_exception(e)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+rv = self.dispatch_request()
+     ^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\venv\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\app\main\routes.py", line 121, in order_confirmation
+total = sum(item.menu_item.price * item.quantity for item in order.items)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\Bastian\Desktop\RestQR\RestQR---Sistema-Digital\app\main\routes.py", line 121, in <genexpr>
+total = sum(item.menu_item.price * item.quantity for item in order.items)
+            ^^^^^^^^^^^^^^
+AttributeError: 'OrderItem' object has no attribute 'menu_item'. Did you mean: 'menu_item_id'?
+The debugger caught an exception in your WSGI application. You can now look at the traceback which led to the error.
+To switch between the interactive traceback and the plaintext one, you can click on the "Traceback" headline. From the text traceback you can also create a paste of it. For code execution mouse-over the frame you want to debug and click on the console icon on the right side.
+
+You can execute arbitrary Python code in the stack frames and there are some extra helpers available for introspection:
+
+dump() shows all variables in the frame
+dump(obj) dumps all that's known about the object

@@ -1,5 +1,6 @@
 Flask==2.0.1
 Flask-SQLAlchemy==2.5.1
+SQLAlchemy<2.0
 Flask-Login==0.6.2
 Flask-WTF==1.1.1
 Flask-Migrate==3.1.0
@@ -10,4 +11,9 @@ email-validator==2.0.0.post2
 python-dotenv==0.19.0
 Werkzeug==2.3.7
 qrcode==7.3
+Pillow
+pytest==7.4.3
+hypothesis==6.92.1
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
 

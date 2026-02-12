@@ -9,6 +9,7 @@ class MenuItem(db.Model):
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(64), nullable=False)
     available = db.Column(db.Boolean, default=True)
+    image_url = db.Column(db.String(256))
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +28,9 @@ class OrderItem(db.Model):
     menu_item_id = db.Column(db.Integer, db.ForeignKey('menu_item.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.String(256))
+    
+    # Add relationship to MenuItem
+    menu_item = db.relationship('MenuItem', backref='order_items', lazy=True)
 
 class TableToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)

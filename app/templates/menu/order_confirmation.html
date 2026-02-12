@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-body text-center p-5">
+                    <!-- Success Icon -->
+                    <div class="success-icon mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <!-- Confirmation Message -->
+                    <h2 class="mb-4">¡Pedido Confirmado!</h2>
+                    
+                    <!-- Order Details -->
+                    <div class="order-details text-start mb-4">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Número de Pedido:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                #{{ order.id }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Mesa:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                {{ order.table_number }}
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Order Items -->
+                        <h5 class="mb-3">Tu Pedido:</h5>
+                        <ul class="list-unstyled">
+                            {% for item in order.items %}
+                            <li class="d-flex justify-content-between mb-2">
+                                <span>{{ item.menu_item.name }} x {{ item.quantity }}</span>
+                                <span>${{ "{:,.0f}".format(item.menu_item.price * item.quantity) }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        
+                        <hr>
+                        
+                        <!-- Total -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Total:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong class="text-primary">${{ "{:,.0f}".format(total) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estimated Time Message -->
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-clock me-2"></i>
+                        Tu pedido estará listo en aproximadamente 15-20 minutos.
+                    </div>
+                    
+                    <!-- Back to Menu Button -->
+                    <a href="{{ url_for('main.menu', token=request.args.get('token', '')) }}" 
+                       class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al Menú
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

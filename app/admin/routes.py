@@ -11,62 +11,89 @@ import secrets
 def generate_table_token():
     return secrets.token_urlsafe(32)
 
+def get_or_create_table_token(table_number):
+    """
+    Get existing active token for table or create new one.
+    
+    Args:
+        table_number: Integer table number
+        
+    Returns:
+        TableToken instance (existing or newly created)
+    """
+    # Check for existing active token
+    existing_token = TableToken.query.filter_by(
+        table_number=table_number,
+        is_active=True
+    ).first()
+    
+    if existing_token:
+        return existing_token
+    
+    # Create new token only if none exists
+    new_token = TableToken(
+        token=generate_table_token(),
+        table_number=table_number,
+        is_active=True
+    )
+    
+    # Generate activation code
+    new_token.generate_activation_code()
+    
+    db.session.add(new_token)
+    db.session.commit()
+    
+    return new_token
+
 @bp.route('/qrgen')
 def qr_generator():
     return render_template('admin/qr_generator.html', current_time=datetime.now())
 
 @bp.route('/generate_table_qr', methods=['POST'])
 def generate_table_qr():
-    data = request.json
-    table_number = data.get('table_number')
-    
-    if not table_number:
-        return jsonify({'error': 'Número de mesa requerido'}), 400
+    try:
+        data = request.json
+        table_number = data.get('table_number')
         
-    # Generar token único para la mesa
-    token = generate_table_token()
-    
-    # Crear URL con el token
-    base_url = request.host_url.rstrip('/')
-    url = f"{base_url}/menu/{token}"
-    
-    # Generar código QR
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(url)
-    qr.make(fit=True)
+        if not table_number:
+            return jsonify({'error': 'Número de mesa requerido'}), 400
+            
+        # Get or create token for the table
+        table_token = get_or_create_table_token(table_number)
+        
+        # Create URL with the token
+        base_url = request.host_url.rstrip('/')
+        url = f"{base_url}/menu/{table_token.token}"
+        
+        # Generar código QR
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(url)
+        qr.make(fit=True)
 
-    # Crear imagen
-    img = qr.make_image(fill_color="black", back_color="white")
-    
-    # Convertir imagen a base64
-    buffered = BytesIO()
-    img.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    
-    # Crear nuevo token de mesa
-    table_token = TableToken(
-        table_number=table_number,
-        token=token,
-        is_active=True
-    )
-    
-    # Generar código de activación
-    activation_code = table_token.generate_activation_code()
-    
-    db.session.add(table_token)
-    db.session.commit()
-    
-    return jsonify({
-        'qr_code': img_str,
-        'token': token,
-        'url': url,
-        'activation_code': activation_code
-    })
+        # Crear imagen
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convertir imagen a base64
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        
+        return jsonify({
+            'qr_code': img_str,
+            'token': table_token.token,
+            'url': url,
+            'activation_code': table_token.activation_code
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/activate_table', methods=['POST'])
 def activate_table():

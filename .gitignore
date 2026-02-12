@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+app.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+startup_error.log
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Vercel
+.vercel
+
+# Documentation (keep only README.md)
+START_HERE.md
+QUICK_START.md
+DEPLOYMENT.md
+DEPLOYMENT_STEPS.txt
+DEPLOYMENT_SUMMARY.md
+SYSTEM_ANALYSIS.md
+FIXES_APPLIED.md
+PRE_DEPLOYMENT_CHECKLIST.md
+
+# Deployment scripts (not needed on Vercel)
+deploy.sh
+deploy.bat
